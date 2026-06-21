@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SysAdmin Prep — הכנה לראיון System Administrator</title>
+  <meta name="description" content="פלטפורמת לימוד אינטראקטיבית להכנה לראיון SysAdmin: Active Directory, DNS, Networking, Kerberos, Backup, VMware, Azure ועוד.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+
+  <!-- PWA: התקנה למסך הבית ועבודה אופליין -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0d1117">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SysAdmin Prep">
+
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div class="scrim" id="scrim"></div>
+  <div class="app">
+    <main class="main">
+      <div class="container" id="mainContent"></div>
+    </main>
+    <aside class="sidebar" id="sidebar"></aside>
+  </div>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+    }
+  </script>
+</body>
+</html>

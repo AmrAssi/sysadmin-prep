@@ -1,0 +1,695 @@
+﻿  
+Junior SysAdmin
+     
+01
+Active Directory + FSMO
+02
+DNS + Global Catalog
+03
+AD Replication + dcdiag + repadmin
+04
+DNS Flow
+05
+Networking + VLANs
+06
+Kerberos + Authentication
+07
+Permissions + NTFS
+08
+Backup + Veeam
+09
+VMware + Virtualization
+10
+Azure + Entra + Intune
+11
+Troubleshooting
+12
+Event Viewer + Event IDs
+13
+Ports + Commands
+14
+ 
+.         
+1  | SysAdmin Junior |  
+sysadmin-prep
+
+=====PAGE=====
+01
+Active Directory
+Directory? Active  
+. , , ,  Microsoft    
+.) ( DNS ,)( Kerberos ,)( LDAP : 
+.   ,  ,     = Directory Active
+?   Join Domain
+1
+Controller Domain  -DNS  
+2
+Record SRV  DC  DNS
+3
+-OU  -AD Object Computer 
+4
+-DC   (Trust) Channel Secure 
+5
+Kerberos   
+GPO  Group Policy Object
+.   
+OU  Domain  Site  Local : 
+. GPO  = Inheritance Block .   = Enforced
+/force gpupdate | /r gpresult :
+Inheritance. Block   Enforced OU.  Domain  Site  Local :  GPO
+ 5  Roles FSMO
+Role
+
+Seize
+PDC Emulator
+Lockout Account , (NTP), 
+
+RID Master
+ Object   SID 
+
+Schema Master
+Objects    AD 
+
+Domain Naming
+-Forest Domains  /
+
+Infrastructure
+References Cross-domain 
+
+fsmo query netdom :
+Lockout. , ,    = Emulator PDC
+Transfer vs Seize
+PDCEmulator -OperationMasterRole DC02 -Identity Move-ADDirectoryServerOperationMasterRole :  DC 
+Transfer
+quit  PDC seize  DC02 server to connect  roles  ntdsutil : DC  Seize
+2  | SysAdmin Junior |  
+sysadmin-prep
+
+=====PAGE=====
+.  =    !    DC  Seize 
+3  | SysAdmin Junior |  
+sysadmin-prep
+
+=====PAGE=====
+02
+DNS + Global Catalog
+8.8.8.8!  DC.  GPO,  Login,    DNS  AD.    DNS
+Records DNS 
+Record
+
+
+A
+IPv4  
+server.domain.local  10.0.0.10
+CNAME
+  
+mail  exchange.domain.local
+MX
+ 
+domain.local  mail.domain.local
+PTR
+  IP DNS: Reverse
+10.0.0.10  server
+SRV
+-AD    
+_ldap._tcp  dc01
+SOA
+-Zone 
+Start of Authority
+DNS 
+
+ 
+nslookup domain.local
+Resolution DNS 
+nslookup -type=SRV _ldap._tcp.domain.local
+Records SRV 
+ipconfig /flushdns
+Cache DNS 
+ipconfig /displaydns
+ Cache 
+dcdiag /test:dns
+-DC  DNS 
+Global Catalog (GC)
+Login. -UPN   -Forest Objects      DC
+Port 3268 (GC) | Port 3269 (GC over SSL)
+. -Multi-Domain Login ,  Groups Universal  GC 
+3268. Port . Groups -Universal Login UPN  -Forest.   = GC
+4  | SysAdmin Junior |  
+sysadmin-prep
+
+=====PAGE=====
+03
+AD Replication + dcdiag + repadmin
+Replication? AD  
+Link. Site   Sites  .  Site  DCs.    -AD  
+.    = Number) Sequence (Update USN
+. Topology Replication  = Checker) Consistency (Knowledge KCC
+DC   dcdiag
+
+ 
+dcdiag
+  
+dcdiag /test:dns
+DNS  SRV Records, Forwarders
+dcdiag /test:replications
+DCs  Replication
+dcdiag /test:netlogons
+Netlogon Service
+dcdiag /test:fsmocheck
+ Roles FSMO
+dcdiag /s:DC02
+ DC  
+dcdiag /v
+Verbose  
+Replication   repadmin
+
+ 
+repadmin /replsummary
+!    
+repadmin /showrepl
+Codes Error +  
+repadmin /showrepl DC02
+ DC  
+repadmin /syncall /AdeP
+Partners   Sync 
+repadmin /showutdvec DC01
+DC  
+repadmin /queue
+-Queue  
+! = 60% 3/5 . = 0% 0/5 .    = delta largest
+Replication 
+Error
+
+
+1722
+ Firewall  Unavailable RPC
+135 Port 
+1256
+   DC
+? DC DNS, Ping,
+1396
+ SPN / Kerberos
+  + setspn
+8606
+Lingering Objects
+repadmin /removelingeringobjects
+8614
+ 60+ Quarantine Replication
+Rebuild DC
+?     
+5  | SysAdmin Junior |  
+sysadmin-prep
+
+=====PAGE=====
+  
+1
+DC02    Admin
+2
+Replication Urgent   Emulator -PDC  DC02
+3
+    Emulator PDC
+4
+  DCs      Replication
+5
+  Emulator PDC   ?   DC03
+.    .  Emulator PDC      DC
+6  | SysAdmin Junior |  
+sysadmin-prep
+
+=====PAGE=====
+04
+DNS Flow  ping www.ynet.co.il
+!         
+ 8  Resolution DNS
+1
+/displaydns) (ipconfig Cache DNS Local 
+2
+C:\Windows\System32\drivers\etc\hosts HOSTS:  
+3
+DC) = AD (    Server -DNS 
+4
+TTL   ,    Cache  Server DNS
+5
+-Forwarder  DC , ynet.co.il  Forwarder
+6
+ynet.co.il  Server Authoritative  (.il) TLD  DNS Root
+7
+TTL  -Cache  +  IP
+8
+ -IP  Ping ICMP
+Cache  Hosts  DNS Server  Forwarder  Root  TLD  Authoritative  IP  Ping
+7  | SysAdmin Junior |  
+sysadmin-prep
+
+=====PAGE=====
+05
+Networking  VLANs, TCP/IP
+ 
+
+
+Switch L2
+    MAC   
+Router L3
+IP     
+VLAN
+   ,     
+Trunk Port
+-Router Switches,   VLAN  
+Access Port
+ ,    VLAN
+NAT
+ IP Public  IP Private 
+ARP
+X? IP    Broadcast: MAC.  IP 
+TCP vs UDP
+
+TCP
+UDP
+
+Handshake 3-Way  
+ 
+
+ 
+ 
+
+HTTP, SSH, SMB, RDP
+DNS, DHCP, VoIP
+-UDP!  DNS . UDP . TCP
+Subnetting
+CIDR
+Subnet Mask
+Hosts
+/24
+255.255.255.0
+254
+/25
+255.255.255.128
+126
+/16
+255.255.0.0
+65,534
+STP + LACP
+.  = STP  Loops. Broadcast   Protocol) Tree (Spanning STP
+.    STP Rapid = RSTP
+Redundancy. +  .       LACP
+8  | SysAdmin Junior |  
+sysadmin-prep
+
+=====PAGE=====
+06
+Kerberos & Authentication
+Server. NTP = Emulator PDC ! 5     Kerberos
+ 6  Login Kerberos
+1
+   -DC AS-REQ  Client
+2
+ 10    TGT  DC
+3
+   TGT
+4
+-TGT  TGS-REQ  Client : 
+5
+  Ticket Service  DC
+6
+!     Ticket  Client
+.    .     Tickets. = Kerberos
+Kerberos vs NTLM
+
+Kerberos
+NTLM
+
+-Domain  
+Fallback: Workgroup, IP
+
+ Auth, Mutual
+ Pass-the-Hash,
+
+ 5  
+  
+9  | SysAdmin Junior |  
+sysadmin-prep
+
+=====PAGE=====
+07
+Permissions + 
+?   Share vs NTFS
+.     
+Only Read :  Only Read = NTFS + Control Full = Share
+. NTFS    , Full = Share Practice: Best
+.    -Share NTFS    
+-Share    Ping 
+1
+445 -Port server Test-NetConnection ? 445 Port
+2
+SMB?   Firewall Windows
+3
+? /  Permissions Share
+4
+    Permissions NTFS
+5
+? -IP    DNS
+10  | SysAdmin Junior |  
+sysadmin-prep
+
+=====PAGE=====
+08
+Backup & Disaster Recovery
+!   Restore  .      
+
+
+RPO
+"? X    "     
+RTO
+    
+3-2-1
+  1 |   2 |  3
+ 
+
+ 
+
+
+Full
+ 
+ 
+ 
+Incremental
+  
+ 
+ 
+Differential
+ -Full 
+
+ 
+Veeam
+(VMware/Hyper-V). -VMs  Enterprise 
+.    VM   Recovery VM Instant
+Object. AD , ,    Recovery Granular
+.  =    Veeam .      Snapshot
+11  | SysAdmin Junior |  
+sysadmin-prep
+
+=====PAGE=====
+09
+VMware & Virtualization
+
+
+ESXi
+     Hypervisor Type-1
+Snapshot
+  =  Snapshot .   ! 
+Datastore
+Local NAS, SAN,  (.vmdk) VM  
+vSwitch
+  VMs    Switch
+vMotion
+Downtime  Hosts   VM 
+vCenter
+Hosts ESXi    
+.  Veeam =   .        Snapshot
+12  | SysAdmin Junior |  
+sysadmin-prep
+
+=====PAGE=====
+10
+Azure + Entra ID + Intune
+ID Entra vs  AD
+
+ AD
+Entra ID
+
+LDAP + Kerberos
+OAuth2 + OIDC
+Join
+Domain Join
+Azure AD Join
+
+On-Premises
+Cloud
+ 
+ADUC, PowerShell
+Entra Portal
+Join 
+
+
+
+Domain Join
+Apps Legacy , GPO . AD
+ 
+Azure AD Join
+Policies Intune . 
+-First
+Hybrid Join
+ Connect AD Azure .
+ 
+Intune
+Apps. Policy, Wipe, :    = MDM
+(BYOD).     , Apps   = MAM
+Access. Conditional         Policy Compliance
+AzureAdPrt DomainJoined, AzureAdJoined, Join:   /status dsregcmd
+13  | SysAdmin Junior |  
+sysadmin-prep
+
+=====PAGE=====
+11
+Troubleshooting  Scenarios
+      DNS   : 
+-Domain     1 Scenario
+1
+?   -DC ping
+2
+? DNS  domain.local nslookup
+3
+?   /status /query w32tm
+4
+? DC  /dclist:domain nltest
+5
+Event Viewer  Security  Event 4625
+6
+C:\Windows\debug\netlogon.log
+-Share   Ping,   2 Scenario
+1
+Test-NetConnection server -Port 445
+2
+SMB?   Firewall Windows
+3
+ Permissions Share
+4
+  Permissions NTFS
+     3 Scenario
+1
+?   ping
+2
+nslookup site.domain.local
+3
+Test-NetConnection server -Port 443
+4
+? Pool -App Site  IIS
+5
+Event Viewer  Application
+  GPO  4 Scenario
+1
+?   /r gpresult
+2
+gpupdate /force
+3
+? -OU  GPO
+4
+-User?   Filtering Security
+5
+? Replication  /replsummary repadmin
+-    
+14  | SysAdmin Junior |  
+sysadmin-prep
+
+=====PAGE=====
+
+
+ 
+DNS
+nslookup domain.local
+Resolution 
+DNS
+ipconfig /flushdns
+Cache 
+DC
+nltest /dclist:domain
+ DCs
+DC
+dcdiag /test:dns
+DC  DNS 
+Replic
+repadmin /replsummary
+Replication 
+Replic
+repadmin /syncall /AdeP
+Sync 
+GPO
+gpresult /r
+ GPOs
+
+Test-NetConnection srv -Port 445
+Port 
+
+w32tm /query /status
+NTP 
+Domain
+dsregcmd /status
+Join 
+AD
+Get-ADUser -Identity user
+ 
+Lock
+Search-ADAccount -LockedOut
+
+15  | SysAdmin Junior |  
+sysadmin-prep
+
+=====PAGE=====
+12
+Event Viewer  Event IDs
+. SysAdmin   . ID Event   "? " :
+Event ID
+Log
+
+4624
+Security
+  Login
+4625
+Security
+  /    ✗  Login
+4740
+Security
+   Lockout Account
+4720
+Security
+  
+4726
+Security
+ 
+4728
+Security
+(Global) Security  
+4648
+Security
+As) (Run  Credentials  Login
+4672
+Security
+Admin Privileged  Login
+4719
+Security
+ Policy Audit
+7045
+System
+  Service
+1102
+Security
+⚠ !   Log Security
+1864
+Directory
+ 14+ Replication   DC
+2042
+Directory
+ 60+ Quarantine Replication
+Account Lockout Investigation
+1
+4740 Event  Log Security  DC  Viewer Event
+2
+     4740 -Event
+3
+4625 Event  Log Security    
+4
+Task? Scheduled Phone? Drives? Mapped :
+5
+Get-ADUser -Identity user -Properties LockedOut,BadLogonCount
+16  | SysAdmin Junior |  
+sysadmin-prep
+
+=====PAGE=====
+13
+Ports + Commands
+Port
+Protocol
+
+53
+DNS
+Name Resolution
+88
+Kerberos
+Authentication  AD Login
+123
+NTP
+-Kerberos!   Sync Time
+135
+RPC
+Remote Procedure Call  AD, DCOM
+389
+LDAP
+AD Queries
+445
+SMB
+   Sharing File
+636
+LDAPS
+(SSL)  LDAP
+3268
+GC
+Global Catalog  Cross-domain
+3269
+GC SSL
+Global Catalog over SSL
+80
+HTTP
+Web Traffic
+443
+HTTPS
+Secure Web  TLS/SSL
+3389
+RDP
+Remote Desktop
+5985
+WinRM
+PowerShell Remoting (HTTP)
+5986
+WinRM
+PowerShell Remoting (HTTPS)
+22
+SSH
+Secure Shell  Linux
+25
+SMTP
+ 
+49152+
+RPC Dyn
+Dynamic RPC  AD Replication!
+17  | SysAdmin Junior |  
+sysadmin-prep
+
+=====PAGE=====
+14
+ 
+.         
+Troubleshooting
+.  .  , DNS, ,     
+DNS
+DC.  GPO,  Login,    DNS  AD.    DNS
+Home Lab
+Identity. Hybrid Veeam, PKI, DC, ESXi,   Lab Home 
+GPO
+Inheritance. Block   Enforced OU.  Domain  Site  Local :  GPO
+Kerberos
+.    .      -Tickets  Kerberos
+Snapshot
+.  Veeam =   .       Snapshot
+Backup
+.     .      
+Permissions
+.   -Share NTFS    
+Replication
+dcdiag.   /replsummary, -repadmin   Replication  
+Global Catalog
+. Groups -Universal Login UPN  -Forest.   = GC
+.          
+18  | SysAdmin Junior |  
+sysadmin-prep
+
+=====PAGE=====
