@@ -1,5 +1,5 @@
 /* SysAdmin Prep — Service Worker (offline app shell) */
-const CACHE = "sysadmin-prep-v1";
+const CACHE = "sysadmin-prep-v2";
 const ASSETS = [
   "./",
   "./index.html",
