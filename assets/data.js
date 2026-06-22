@@ -54,6 +54,18 @@ window.PREP_DATA = {
           ],
         },
         {
+          heading: "ADMX — Administrative Templates",
+          type: "list",
+          items: [
+            ["מה זה", "קבצי XML שמגדירים אילו הגדרות זמינות בעורך ה-GPO."],
+            ["ADMX מול ADML", "ADMX = הגדרות המדיניות (ניטרלי לשפה) · ADML = מחרוזות התצוגה לפי שפה."],
+            ["החליף את", "פורמט ADM הישן (מאז Windows Vista / Server 2008)."],
+            ["מיקום מקומי", "C:\\Windows\\PolicyDefinitions — נקרא בנפרד בכל מחשב."],
+            ["Central Store ⭐", "תיקייה מרכזית ב-SYSVOL: \\\\domain\\SYSVOL\\domain\\Policies\\PolicyDefinitions — כל האדמינים וה-DCs משתמשים באותם templates."],
+            ["הוספת template", "מעתיקים .admx ל-PolicyDefinitions ואת .adml לתת-תיקיית השפה (en-US). למשל עבור Edge/Chrome/Office."],
+          ],
+        },
+        {
           heading: "FSMO — 5 התפקידים",
           type: "table",
           columns: ["Role", "רמה", "אחריות"],
@@ -82,6 +94,8 @@ window.PREP_DATA = {
         ["איזה תפקיד FSMO אחראי על זמן, Account Lockout ועריכת GPO?", "PDC Emulator."],
         ["מהו סדר חלות ה-GPO?", "Local → Site → Domain → OU (LSDOU)."],
         ["מה ההבדל בין Transfer ל-Seize?", "Transfer = העברה מסודרת כשהמקור חי. Seize = כפייה כשה-DC מת (ואסור להחזירו לרשת)."],
+        ["מה ההבדל בין ADMX ל-ADML?", "ADMX = הגדרות המדיניות (ניטרלי לשפה); ADML = מחרוזות התצוגה לפי שפה."],
+        ["מהו Central Store ולמה הוא חשוב?", "תיקיית PolicyDefinitions מרכזית ב-SYSVOL — כל האדמינים וה-DCs משתמשים באותם ADMX, אחיד ומסונכרן."],
       ],
       quiz: [
         {
@@ -101,6 +115,12 @@ window.PREP_DATA = {
           options: ["Block Inheritance", "Enforced", "המדיניות המקומית", "האחרונה שנערכה"],
           answer: 1,
           explain: "Enforced כופה את ה-GPO וגובר על Block Inheritance.",
+        },
+        {
+          q: "היכן מאחסנים קבצי ADMX כדי שכל האדמינים ישתמשו באותם templates?",
+          options: ["C:\\Windows\\System32", "Central Store ב-SYSVOL", "ב-Registry המקומי", "ב-Global Catalog"],
+          answer: 1,
+          explain: "ה-Central Store הוא תיקיית PolicyDefinitions ב-SYSVOL — מקור אחיד שמסונכרן לכל ה-DCs.",
         },
       ],
     },
